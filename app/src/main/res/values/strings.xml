@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Uravugal</string>
+    <string name="switch_project">Switch Project</string>
+    <string name="help">Help</string>
+    <string name="actions">Actions</string>
+    <string name="menu_1">Search Person</string>
+    <string name="menu_2">Ascertain Relation</string>
+    <string name="menu_3">Config Double-Tap</string>
+    <string name="menu_4">Switch Project</string>
+    <string name="menu_5">Switch Language</string>
+    <string name="menu_6">Help</string>
+    <string name="app_logo">App Logo</string>
 </resources>
