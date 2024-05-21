@@ -29,12 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
+import androidx.navigation.compose.rememberNavController
+import org.sakuram.relation.composable.SwitchProjectDialog
 import org.sakuram.relation.ui.theme.UravugalTheme
 
 
@@ -44,10 +49,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             UravugalTheme {
+                val navController = rememberNavController()
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
                     UravugalScreen(
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        navController
                     )
+                }
+                NavHost(navController, startDestination = "home") {
+                    composable("home") { UravugalTopBar(Modifier, navController) }
+                    dialog("switchProject") { SwitchProjectDialog(Modifier, navController) }
                 }
             }
         }
@@ -55,8 +66,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun UravugalScreen(modifier: Modifier = Modifier) {
-    UravugalTopBar()
+fun UravugalScreen(modifier: Modifier = Modifier, navController: NavController) {
+    UravugalTopBar(modifier, navController)
     UravugalScreenBody()
     UravugalBottomBar()
 }
@@ -64,10 +75,10 @@ fun UravugalScreen(modifier: Modifier = Modifier) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UravugalTopBar(modifier: Modifier = Modifier) {
+fun UravugalTopBar(modifier: Modifier = Modifier, navController: NavController) {
     var showMenu by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val mContext = LocalContext.current
+    // val mContext = LocalContext.current
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -142,7 +153,10 @@ fun UravugalTopBar(modifier: Modifier = Modifier) {
                 })
             DropdownMenuItem(
                 text = { Text(text = stringResource(R.string.menu_4)) },
-                onClick = { showMenu = false },
+                onClick = {
+                    showMenu = false
+                    navController.navigate("switchProject")
+                          },
                 leadingIcon = {
                     Icon(
                         ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
@@ -187,6 +201,10 @@ fun UravugalBottomBar(modifier: Modifier = Modifier
 @Composable
 fun GreetingPreview() {
     UravugalTheme {
-        UravugalScreen()
+        val navController = rememberNavController()
+        UravugalScreen(
+            modifier = Modifier,
+            navController
+        )
     }
 }
