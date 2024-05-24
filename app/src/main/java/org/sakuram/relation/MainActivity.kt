@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +35,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,10 +44,12 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import org.sakuram.relation.composable.SwitchProjectDialog
 import org.sakuram.relation.ui.theme.UravugalTheme
+import org.sakuram.relation.viewmodel.MainScreenViewModel
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val viewModel: MainScreenViewModel by viewModels()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -53,12 +58,14 @@ class MainActivity : ComponentActivity() {
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
                     UravugalScreen(
                         modifier = Modifier.padding(innerPadding),
-                        navController
+                        navController, viewModel
                     )
                 }
+                // TODO https://developer.android.com/guide/navigation/design
+                // instead of passing the NavController to your composables, expose an event to the NavHost
                 NavHost(navController, startDestination = "home") {
-                    composable("home") { UravugalTopBar(Modifier, navController) }
-                    dialog("switchProject") { SwitchProjectDialog(Modifier, navController) }
+                    composable("home") { UravugalTopBar(navController, viewModel) }
+                    dialog("switchProject") { SwitchProjectDialog(navController, viewModel) }
                 }
             }
         }
@@ -66,8 +73,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun UravugalScreen(modifier: Modifier = Modifier, navController: NavController) {
-    UravugalTopBar(modifier, navController)
+fun UravugalScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    mainScreenViewModel: MainScreenViewModel
+) {
+    UravugalTopBar(navController, mainScreenViewModel)
+    // TODO https://developer.android.com/develop/ui/compose/migrate/other-considerations
+    // Instead of passing down ViewModel instances to other composables, pass only the required data and functions as parameters.
     UravugalScreenBody()
     UravugalBottomBar()
 }
@@ -75,10 +88,15 @@ fun UravugalScreen(modifier: Modifier = Modifier, navController: NavController) 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UravugalTopBar(modifier: Modifier = Modifier, navController: NavController) {
+fun UravugalTopBar(
+    navController: NavController, mainScreenViewModel: MainScreenViewModel = viewModel(),
+) {
     var showMenu by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val mainScreenUiState by mainScreenViewModel.uiState.collectAsState()
+    val projectName = mainScreenUiState.projectName
     // val mContext = LocalContext.current
+    // println("At Top Bar Project name is ${viewModel.uiState.value.projectName}")
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -98,11 +116,18 @@ fun UravugalTopBar(modifier: Modifier = Modifier, navController: NavController) 
                     }
                 },
                 title = {
-                    Text(
-                        stringResource(R.string.app_name),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Column {
+                        if (projectName != null) {
+                            Text(
+                                projectName.toString()
+                            )
+                        }
+                        Text(
+                            stringResource(R.string.app_name),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 },
                 actions = {
                     IconButton(onClick = {showMenu = !showMenu}) {
@@ -156,6 +181,7 @@ fun UravugalTopBar(modifier: Modifier = Modifier, navController: NavController) 
                 onClick = {
                     showMenu = false
                     navController.navigate("switchProject")
+                    println("Returned from Switch Project Dialog")
                           },
                 leadingIcon = {
                     Icon(
@@ -192,12 +218,13 @@ fun UravugalScreenBody(modifier: Modifier = Modifier
     .background(color = Color(0xFFFFD700))
     .fillMaxWidth()) {
 }
+@Composable
 fun UravugalBottomBar(modifier: Modifier = Modifier
     .height(100.dp)
     .background(color = Color.Blue)
     .fillMaxWidth()) {
 }
-@Preview(showBackground = true)
+/* @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     UravugalTheme {
@@ -207,4 +234,4 @@ fun GreetingPreview() {
             navController
         )
     }
-}
+} */
