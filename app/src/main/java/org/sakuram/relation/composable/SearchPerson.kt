@@ -1,6 +1,5 @@
 package org.sakuram.relation.composable
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -26,10 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.sakuram.relation.viewmodel.MainScreenViewModel
 
-@SuppressLint("SuspiciousIndentation")
 @Composable
-fun SwitchProjectDialog(navController: NavController, mainScreenViewModel: MainScreenViewModel) {
-    val projectId = remember { mutableStateOf("")}
+fun SearchPersonDialog(
+    navController: NavController,
+    mainScreenViewModel: MainScreenViewModel
+) {
+    val personIdMS = remember { mutableStateOf("")}
 
     Card(
         modifier = Modifier
@@ -40,16 +41,17 @@ fun SwitchProjectDialog(navController: NavController, mainScreenViewModel: MainS
         shape = RoundedCornerShape(16.dp),
     ) {
         OutlinedTextField(
-            label = { Text("Project", color = Color.Black) },
-            value = projectId.value,
+            label = { Text("Person Id", color = Color.Black) },
+            value = personIdMS.value,
             singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
-                ),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Green,
-                unfocusedBorderColor = Color.Green),
-            onValueChange = { projectId.value = it },
+                unfocusedBorderColor = Color.Green
+            ),
+            onValueChange = { personIdMS.value = it },
         )
         val focusManager = LocalFocusManager.current
         Spacer(modifier = Modifier.height(16.dp))
@@ -59,20 +61,18 @@ fun SwitchProjectDialog(navController: NavController, mainScreenViewModel: MainS
         ) {
             Button(onClick = {
                 focusManager.clearFocus()
-                if (projectId.value != "") {
-                    val projectDetails = mainScreenViewModel.switchProject(projectId.value)
-                    if (projectDetails == null) {
-                        println("No project set")
-                    } else {
-                        println("Project set as ${projectDetails.projectName}")
-                        mainScreenViewModel.projectSwitched(projectName = projectDetails.projectName)
+                if (personIdMS.value != "") {
+                    try {
+                        mainScreenViewModel.retrievePersonAttributes(personIdMS.value.toLong())
+                    } catch(e: NumberFormatException) {
+                        println("Invalid Person Id")
                     }
                 }
                 // TODO On Error, don't popBackStack
                 println("About to popBackStack")
                 navController.popBackStack()
             }) {
-                Text("Switch")
+                Text("Search")
             }
             Button(onClick = {
                 navController.popBackStack()
