@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import org.sakuram.relation.viewmodel.MainScreenViewModel
 
 @Composable
@@ -64,6 +65,7 @@ fun SearchPersonDialog(
                 if (personIdMS.value != "") {
                     try {
                         mainScreenViewModel.retrievePersonAttributes(personIdMS.value.toLong())
+                        mainScreenViewModel.retrieveRelations(RetrieveRelationsRequestVO(personIdMS.value.toLong()))
                     } catch(e: NumberFormatException) {
                         println("Invalid Person Id")
                     }

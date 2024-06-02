@@ -39,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -92,7 +91,7 @@ fun UravugalScreen(
 ) {
     Scaffold(
 
-        topBar = @androidx.compose.runtime.Composable {
+        topBar = @Composable {
             UravugalTopBar(navController, mainScreenViewModel)
         },
     ) {
@@ -236,7 +235,11 @@ fun UravugalScreenBody(
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Graph", "Details")
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        // .verticalScroll(rememberScrollState())
+        // .horizontalScroll(rememberScrollState())
+    ) {
         Spacer(modifier = Modifier.padding(top = 100.dp))
         TabRow(
             selectedTabIndex = tabIndex,
@@ -258,25 +261,33 @@ fun UravugalScreenBody(
 @Composable
 fun UravugalGraphTab(
     modifier: Modifier = Modifier
-    .fillMaxHeight()
-    .background(color = Color(0xFFFFD700))
-    .fillMaxWidth(),
+        .fillMaxHeight()
+        .background(color = Color(0xFFFFD700))
+        .fillMaxWidth(),
     mainScreenViewModel: MainScreenViewModel
 ) {
 
     val graphTabUiState by mainScreenViewModel.graphTabUiState.collectAsState()
-    val graphData = graphTabUiState.graphData
-    Column() {
-        Text(
-            text = graphData
-        )
+    val nodesMap = graphTabUiState.nodesMap
+    val edgesList = graphTabUiState.edgesList
+    Column {
+        nodesMap?.entries?.map {
+            Text(
+                text = "${it.key} ::: ${it.value.label} :: ${it.value.label} :: ${it.value.x} :: ${it.value.y}"
+            )
+        }
+        edgesList?.map {
+            Text(
+                text = "${it.source} :: ${it.target} :: ${it.label}"
+            )
+        }
     }
 }
 
 @Composable
 fun UravugalDetailsTab(
     modifier: Modifier = Modifier
-    .fillMaxHeight()
+        .fillMaxHeight()
     .background(color = Color(0xFFF5F5DC))
     .fillMaxWidth(),
     mainScreenViewModel: MainScreenViewModel

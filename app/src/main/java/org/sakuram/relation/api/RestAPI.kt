@@ -22,10 +22,11 @@ object RestAPI {
 
     val uravugalProjectUserApi: UravugalProjectUserApi
     val uravugalPersonRelationApi: UravugalPersonRelationApi
+    val moshi: Moshi
 
     init {
 
-        val moshi = Moshi.Builder()
+        moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .add(JsonDateAdapter())
             .add(JsonByteArrayAdapter())

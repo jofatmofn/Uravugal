@@ -34,6 +34,16 @@ object CommonApiRepository {
 
     suspend fun <T>callApiAsynchronous(coroutineScope: CoroutineScope, callDef: suspend CoroutineScope.() -> Response<T>): T? {
         val call: Response<T>?
+
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+                // .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()
+                .penaltyLog()
+                .build()
+        )
+
         try {
             call = callDef.invoke(coroutineScope)
         } catch(ex: Exception) {
