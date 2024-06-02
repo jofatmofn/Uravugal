@@ -8,15 +8,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -94,9 +96,13 @@ fun UravugalScreen(
         topBar = @Composable {
             UravugalTopBar(navController, mainScreenViewModel)
         },
-    ) {
-            UravugalScreenBody(modifier.padding(it), mainScreenViewModel)
+        content = @Composable  {
+            Column(modifier.padding(it)) {
+                // This Column with padding helps to solve the problem of topBar overlapping the content
+                UravugalScreenBody(Modifier, mainScreenViewModel)
+            }
         }
+    )
     // TODO https://developer.android.com/develop/ui/compose/migrate/other-considerations
     // Instead of passing down ViewModel instances to other composables, pass only the required data and functions as parameters.
 }
@@ -240,7 +246,7 @@ fun UravugalScreenBody(
         // .verticalScroll(rememberScrollState())
         // .horizontalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = Modifier.padding(top = 100.dp))
+        // Spacer(modifier = Modifier.padding(top = 100.dp))
         TabRow(
             selectedTabIndex = tabIndex,
         ) {
@@ -270,7 +276,11 @@ fun UravugalGraphTab(
     val graphTabUiState by mainScreenViewModel.graphTabUiState.collectAsState()
     val nodesMap = graphTabUiState.nodesMap
     val edgesList = graphTabUiState.edgesList
-    Column {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .horizontalScroll(rememberScrollState())
+    ) {
         nodesMap?.entries?.map {
             Text(
                 text = "${it.key} ::: ${it.value.label} :: ${it.value.label} :: ${it.value.x} :: ${it.value.y}"
