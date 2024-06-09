@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -17,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,7 +31,6 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,9 +47,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import org.sakuram.relation.composable.GraphTab
 import org.sakuram.relation.composable.SearchPersonDialog
 import org.sakuram.relation.composable.SwitchProjectDialog
 import org.sakuram.relation.ui.theme.UravugalTheme
+import org.sakuram.relation.utility.Constants
 import org.sakuram.relation.utility.UravugalPreferences
 import org.sakuram.relation.viewmodel.MainScreenViewModel
 
@@ -117,8 +115,7 @@ fun UravugalTopBar(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val mainScreenUiState by mainScreenViewModel.mainScreenUiState.collectAsState()
     val projectName = mainScreenUiState.projectName
-    // val mContext = LocalContext.current
-    // println("At Top Bar Project name is ${viewModel.uiState.value.projectName}")
+
         CenterAlignedTopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color(0xFFF4A460), // MaterialTheme.colorScheme.primaryContainer,
@@ -167,7 +164,6 @@ fun UravugalTopBar(
                 onClick = {
                     showMenu = false
                     navController.navigate("searchPerson")
-                    println("Returned from Search Person Dialog")
                           },
                 leadingIcon = {
                     Icon(
@@ -238,15 +234,13 @@ fun UravugalScreenBody(
     .fillMaxWidth(),
     mainScreenViewModel: MainScreenViewModel
 ) {
-    var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Graph", "Details")
+    val mainScreenUiState by mainScreenViewModel.mainScreenUiState.collectAsState()
+    val tabIndex = mainScreenUiState.tabIndex
 
     Column(modifier = Modifier
         .fillMaxWidth()
-        // .verticalScroll(rememberScrollState())
-        // .horizontalScroll(rememberScrollState())
     ) {
-        // Spacer(modifier = Modifier.padding(top = 100.dp))
         TabRow(
             selectedTabIndex = tabIndex,
         ) {
@@ -254,42 +248,16 @@ fun UravugalScreenBody(
                 Tab(
                     text = { Text(title) },
                     selected = tabIndex == index,
-                    onClick = { tabIndex = index },
+                    onClick =
+                    {
+                        mainScreenViewModel.switchTab(index)
+                    },
                 )
             }
         }
         when (tabIndex) {
-            0 -> UravugalGraphTab(modifier, mainScreenViewModel)
-            1 -> UravugalDetailsTab(modifier, mainScreenViewModel)
-        }
-    }
-}
-@Composable
-fun UravugalGraphTab(
-    modifier: Modifier = Modifier
-        .fillMaxHeight()
-        .background(color = Color(0xFFFFD700))
-        .fillMaxWidth(),
-    mainScreenViewModel: MainScreenViewModel
-) {
-
-    val graphTabUiState by mainScreenViewModel.graphTabUiState.collectAsState()
-    val nodesMap = graphTabUiState.nodesMap
-    val edgesList = graphTabUiState.edgesList
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .horizontalScroll(rememberScrollState())
-    ) {
-        nodesMap?.entries?.map {
-            Text(
-                text = "${it.key} ::: ${it.value.label} :: ${it.value.label} :: ${it.value.x} :: ${it.value.y}"
-            )
-        }
-        edgesList?.map {
-            Text(
-                text = "${it.source} :: ${it.target} :: ${it.label}"
-            )
+            Constants.TAB_INDEX_GRAPH -> GraphTab(modifier, mainScreenViewModel)
+            Constants.TAB_INDEX_DETAILS -> UravugalDetailsTab(modifier, mainScreenViewModel)
         }
     }
 }
@@ -319,7 +287,7 @@ fun UravugalDetailsTab(
                 TableCell(text = "Value", weight = column2Weight)
             }
         }
-        println("No. of items: ${attributeValueList.size}")
+
         // Data
         attributeValueList.map {
             item {
@@ -329,15 +297,6 @@ fun UravugalDetailsTab(
                 }
             }
         }
-        /*( items(attributeValueList.size ?: 0) {
-            attributeValueList.map {
-                println("Compose: ${it.attributeName} ${it.attributeValue}")
-                Row(Modifier.fillMaxWidth()) {
-                    TableCell(text = it.attributeName, weight = column1Weight)
-                    TableCell(text = it.attributeValue, weight = column2Weight)
-                }
-            }
-        } */
     }
 }
 

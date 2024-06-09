@@ -12,6 +12,10 @@ import org.sakuram.relation.apimodel.ProjectVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import org.sakuram.relation.repository.PersonRelationApiRepository
 import org.sakuram.relation.repository.ProjectUserApiRepository
+import org.sakuram.relation.utility.Constants.PERSON_NODE_SCALE_X
+import org.sakuram.relation.utility.Constants.PERSON_NODE_SCALE_Y
+import org.sakuram.relation.utility.Constants.PERSON_NODE_SIZE_X
+import org.sakuram.relation.utility.Constants.PERSON_NODE_SIZE_Y
 
 class MainScreenViewModel: ViewModel() {
     private val _mainScreenUiState = MutableStateFlow(MainScreenUiState())
@@ -24,6 +28,14 @@ class MainScreenViewModel: ViewModel() {
 
     fun switchProject(projectId: String): ProjectVO? =
         ProjectUserApiRepository.switchProject(projectId)
+
+    fun switchTab(tabIndex: Int) {
+        _mainScreenUiState.update {
+            it.copy(
+                tabIndex = tabIndex
+            )
+        }
+    }
 
     fun retrievePersonAttributes(entityId: Long) {
         /* job?.cancel()
@@ -46,23 +58,29 @@ class MainScreenViewModel: ViewModel() {
         /* job?.cancel()
         job = */ viewModelScope.launch {
             coroutineScope {
-                println("In MODEL, PersonId: ${retrieveRelationsRequestVO.startPersonId}")
-                val graphVO = PersonRelationApiRepository.retrieveRelations(retrieveRelationsRequestVO)
+                val graphVO =
+                    PersonRelationApiRepository.retrieveRelations(retrieveRelationsRequestVO)
                 _graphTabUiState.update {
                     it.copy(
                         nodesMap = graphVO?.nodes?.associate
-                        {
+                        {personVO ->
                             Pair(
-                                it.id,
-                                Node(it.label, it.x, it.y)
+                                personVO.id,
+                                Node(
+                                    personVO.label,
+                                    personVO.x.toFloat() * PERSON_NODE_SCALE_X,
+                                    personVO.x.toFloat() * PERSON_NODE_SCALE_X + PERSON_NODE_SIZE_X,
+                                    personVO.y.toFloat() * PERSON_NODE_SCALE_Y,
+                                    personVO.y.toFloat() * PERSON_NODE_SCALE_Y + PERSON_NODE_SIZE_Y
+                                )
                             )
                         },
                         edgesList = graphVO?.edges?.map
-                        {
+                        {relationVO ->
                             Edge(
-                                it.source,
-                                it.target,
-                                it.label
+                                relationVO.source,
+                                relationVO.target,
+                                relationVO.label
                             )
                         },
                     )

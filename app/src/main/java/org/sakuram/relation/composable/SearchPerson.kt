@@ -64,7 +64,6 @@ fun SearchPersonDialog(
                 focusManager.clearFocus()
                 if (personIdMS.value != "") {
                     try {
-                        mainScreenViewModel.retrievePersonAttributes(personIdMS.value.toLong())
                         mainScreenViewModel.retrieveRelations(RetrieveRelationsRequestVO(personIdMS.value.toLong()))
                     } catch(e: NumberFormatException) {
                         println("Invalid Person Id")

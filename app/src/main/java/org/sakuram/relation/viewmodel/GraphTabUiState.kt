@@ -7,8 +7,10 @@ data class GraphTabUiState (
 
 data class Node (
     val label: String? = "",
-    val x: Double = 0.0,
-    val y: Double = 0.0,
+    val xStart: Float = 0.0f,
+    val xEnd: Float = 0.0f,
+    val yStart: Float = 0.0f,
+    val yEnd: Float = 0.0f,
 )
 
 data class Edge (
