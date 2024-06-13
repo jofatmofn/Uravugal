@@ -12,6 +12,7 @@ import org.sakuram.relation.apimodel.ProjectVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import org.sakuram.relation.repository.PersonRelationApiRepository
 import org.sakuram.relation.repository.ProjectUserApiRepository
+import org.sakuram.relation.utility.Constants
 import org.sakuram.relation.utility.Constants.PERSON_NODE_SCALE_X
 import org.sakuram.relation.utility.Constants.PERSON_NODE_SCALE_Y
 import org.sakuram.relation.utility.Constants.PERSON_NODE_SIZE_X
@@ -20,9 +21,9 @@ import org.sakuram.relation.utility.Constants.PERSON_NODE_SIZE_Y
 class MainScreenViewModel: ViewModel() {
     private val _mainScreenUiState = MutableStateFlow(MainScreenUiState())
     val mainScreenUiState = _mainScreenUiState.asStateFlow()
-    private val _graphTabUiState = MutableStateFlow(GraphTabUiState(emptyMap<String, Node>(), emptyList<Edge>()))
+    private val _graphTabUiState = MutableStateFlow(GraphTabUiState(emptyMap<Long, Node>(), emptyMap<Long, Edge>()))
     val graphTabUiState = _graphTabUiState.asStateFlow()
-    private val _detailsTabUiState = MutableStateFlow(DetailsTabUiState(emptyList<AttributeValue>()))
+    private val _detailsTabUiState = MutableStateFlow(DetailsTabUiState(emptyList<AttributeValue>(), Constants.DETAILS_OF_NODE, ""))
     val detailsTabUiState = _detailsTabUiState.asStateFlow()
     // private var job: Job? = null
 
@@ -33,6 +34,24 @@ class MainScreenViewModel: ViewModel() {
         _mainScreenUiState.update {
             it.copy(
                 tabIndex = tabIndex
+            )
+        }
+    }
+
+    fun setNodeDetails(label: String) {
+        _detailsTabUiState.update {
+            it.copy(
+                detailsOf = Constants.DETAILS_OF_NODE,
+                title = "Person: $label"
+            )
+        }
+    }
+
+    fun setEdgeDetails(label: String, node1Label: String, node2Label: String) {
+        _detailsTabUiState.update {
+            it.copy(
+                detailsOf = Constants.DETAILS_OF_EDGE,
+                title = "Relation: $label between $node1Label and $node2Label"
             )
         }
     }
@@ -54,6 +73,23 @@ class MainScreenViewModel: ViewModel() {
         }
     }
 
+    fun retrieveRelationAttributes(entityId: Long) {
+        /* job?.cancel()
+        job = */ viewModelScope.launch {
+            coroutineScope {
+                val relationDetails = PersonRelationApiRepository.retrieveRelationAttributes(entityId)
+                _detailsTabUiState.update {
+                    it.copy(attributeValueList = relationDetails?.attributeValueVOList?.map { attributeValueVO: AttributeValueVO ->
+                        AttributeValue(
+                            attributeValueVO.attributeName,
+                            attributeValueVO.attributeValue
+                        )
+                    } ?: emptyList<AttributeValue>())
+                }
+            }
+        }
+    }
+
     fun retrieveRelations(retrieveRelationsRequestVO: RetrieveRelationsRequestVO) {
         /* job?.cancel()
         job = */ viewModelScope.launch {
@@ -65,9 +101,9 @@ class MainScreenViewModel: ViewModel() {
                         nodesMap = graphVO?.nodes?.associate
                         {personVO ->
                             Pair(
-                                personVO.id,
+                                personVO.id.toLong(),
                                 Node(
-                                    personVO.label,
+                                    personVO.label.toString(),
                                     personVO.x.toFloat() * PERSON_NODE_SCALE_X,
                                     personVO.x.toFloat() * PERSON_NODE_SCALE_X + PERSON_NODE_SIZE_X,
                                     personVO.y.toFloat() * PERSON_NODE_SCALE_Y,
@@ -75,12 +111,54 @@ class MainScreenViewModel: ViewModel() {
                                 )
                             )
                         },
-                        edgesList = graphVO?.edges?.map
+                    )
+                }
+                _graphTabUiState.update {
+                    it.copy(
+                        edgesMap = graphVO?.edges?.associate
                         {relationVO ->
-                            Edge(
-                                relationVO.source,
-                                relationVO.target,
-                                relationVO.label
+                            val sourceNode: Node? = _graphTabUiState.value.nodesMap?.get(relationVO.source.toLong())
+                            val targetNode: Node? = _graphTabUiState.value.nodesMap?.get(relationVO.target.toLong())
+                            println("${relationVO.label}: ${sourceNode?.xStart}, ${sourceNode?.yStart}, ${sourceNode?.xEnd}, ${sourceNode?.yEnd}")
+                            println("${relationVO.label}: ${targetNode?.xStart}, ${targetNode?.yStart}, ${targetNode?.xEnd}, ${targetNode?.yEnd}")
+                            var xStart: Float = 0.0f
+                            var xEnd: Float = 0.0f
+                            var yStart: Float = 0.0f
+                            var yEnd: Float = 0.0f
+                            if (sourceNode != null && targetNode != null) {
+                                if (sourceNode.yStart < targetNode.yStart) {
+                                    yStart = sourceNode.yEnd
+                                    yEnd = targetNode.yStart
+                                    xStart = (sourceNode.xStart + sourceNode.xEnd) / 2
+                                    xEnd = (targetNode.xStart + targetNode.xEnd) / 2
+                                } else if (sourceNode.yStart == targetNode.yStart) {
+                                    yStart = (sourceNode.yStart + sourceNode.yEnd) / 2
+                                    yEnd = (sourceNode.yStart + sourceNode.yEnd) / 2
+                                    if (sourceNode.xStart < targetNode.xStart) {
+                                        xStart = sourceNode.xEnd
+                                        xEnd = targetNode.xStart
+                                    } else {
+                                        xStart = targetNode.xEnd
+                                        xEnd = sourceNode.xStart
+                                    }
+                                } else {
+                                    yStart = targetNode.yEnd
+                                    yEnd = sourceNode.yStart
+                                    xStart = (targetNode.xStart + targetNode.xEnd) / 2
+                                    xEnd = (sourceNode.xStart + sourceNode.xEnd) / 2
+                                }
+                            }
+                            Pair(
+                                relationVO.id,
+                                Edge(
+                                    relationVO.source.toLong(),
+                                    relationVO.target.toLong(),
+                                    relationVO.label.toString(),
+                                    xStart,
+                                    xEnd,
+                                    yStart,
+                                    yEnd
+                                )
                             )
                         },
                     )

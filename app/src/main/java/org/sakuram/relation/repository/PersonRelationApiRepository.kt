@@ -7,6 +7,7 @@ import okhttp3.RequestBody
 import org.sakuram.relation.api.RestAPI
 import org.sakuram.relation.apimodel.GraphVO
 import org.sakuram.relation.apimodel.RetrievePersonAttributesResponseVO
+import org.sakuram.relation.apimodel.RetrieveRelationAttributesResponseVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import retrofit2.Response
 import kotlin.coroutines.coroutineContext
@@ -23,6 +24,19 @@ object PersonRelationApiRepository {
             )
         }
         return CommonApiRepository.callApiAsynchronous<RetrievePersonAttributesResponseVO>(CoroutineScope(
+            coroutineContext), lambda)
+    }
+
+    suspend fun retrieveRelationAttributes(entityId: Long): RetrieveRelationAttributesResponseVO? {
+        val lambda : suspend CoroutineScope.() -> Response<RetrieveRelationAttributesResponseVO> = {
+            RestAPI.uravugalPersonRelationApi.retrieveRelationAttributes(
+                RequestBody.create(
+                    MediaType.parse("application/json; charset=utf-8"),
+                    entityId.toString()
+                )
+            )
+        }
+        return CommonApiRepository.callApiAsynchronous<RetrieveRelationAttributesResponseVO>(CoroutineScope(
             coroutineContext), lambda)
     }
 

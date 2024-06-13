@@ -6,16 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -40,13 +34,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import org.sakuram.relation.composable.DetailsTab
 import org.sakuram.relation.composable.GraphTab
 import org.sakuram.relation.composable.SearchPersonDialog
 import org.sakuram.relation.composable.SwitchProjectDialog
@@ -116,43 +110,44 @@ fun UravugalTopBar(
     val mainScreenUiState by mainScreenViewModel.mainScreenUiState.collectAsState()
     val projectName = mainScreenUiState.projectName
 
-        CenterAlignedTopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFF4A460), // MaterialTheme.colorScheme.primaryContainer,
-                // titleContentColor = Color(0xFFF4A460), // MaterialTheme.colorScheme.primary,
-            ),
-            navigationIcon = {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
-                        contentDescription = stringResource(R.string.app_logo)
-                    )
-                }
-            },
-            title = {
-                Column {
-                    if (projectName != null) {
-                        Text(
-                            projectName.toString()
-                        )
-                    }
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xFFF4A460), // MaterialTheme.colorScheme.primaryContainer,
+            // titleContentColor = Color(0xFFF4A460), // MaterialTheme.colorScheme.primary,
+        ),
+        navigationIcon = {
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = stringResource(R.string.app_logo)
+                )
+            }
+        },
+        title = {
+            Column {
+                if (projectName != null) {
                     Text(
-                        stringResource(R.string.app_name),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        projectName.toString()
                     )
                 }
-            },
-            actions = {
-                IconButton(onClick = { showMenu = !showMenu }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.menu_24dp),
-                        contentDescription = stringResource(R.string.actions)
-                    )
-                }
-            },
-            scrollBehavior = scrollBehavior,
-        )
+                Text(
+                    stringResource(R.string.app_name),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { showMenu = !showMenu }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.menu_24dp),
+                    contentDescription = stringResource(R.string.actions)
+                )
+            }
+        },
+        scrollBehavior = scrollBehavior,
+    )
+
     // Don't refactor the menu code into a separate Composable as the Action Icon and Menu need to share a single State for recomposition
     if (showMenu) {
         DropdownMenu(
@@ -257,59 +252,8 @@ fun UravugalScreenBody(
         }
         when (tabIndex) {
             Constants.TAB_INDEX_GRAPH -> GraphTab(modifier, mainScreenViewModel)
-            Constants.TAB_INDEX_DETAILS -> UravugalDetailsTab(modifier, mainScreenViewModel)
+            Constants.TAB_INDEX_DETAILS -> DetailsTab(modifier, mainScreenViewModel)
         }
     }
 }
 
-@Composable
-fun UravugalDetailsTab(
-    modifier: Modifier = Modifier
-        .fillMaxHeight()
-    .background(color = Color(0xFFF5F5DC))
-    .fillMaxWidth(),
-    mainScreenViewModel: MainScreenViewModel
-) {
-    val detailsTabUiState by mainScreenViewModel.detailsTabUiState.collectAsState()
-    val attributeValueList = detailsTabUiState.attributeValueList
-    val column1Weight = .4f
-    val column2Weight = .6f
-    // The LazyColumn will be our table. Notice the use of the weights below
-    LazyColumn(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Header
-        item {
-            Row(Modifier.background(Color.Gray)) {
-                TableCell(text = "Attribute", weight = column1Weight)
-                TableCell(text = "Value", weight = column2Weight)
-            }
-        }
-
-        // Data
-        attributeValueList.map {
-            item {
-                Row(Modifier.fillMaxWidth()) {
-                    TableCell(text = it.attributeName, weight = column1Weight)
-                    TableCell(text = it.attributeValue, weight = column2Weight)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RowScope.TableCell(
-    text: String,
-    weight: Float
-) {
-    Text(
-        text = text,
-        Modifier
-            .border(1.dp, Color.Black)
-            .weight(weight)
-            .padding(8.dp)
-    )
-}

@@ -11,4 +11,6 @@ object Constants {
     const val PERSON_NODE_SIZE_Y = 100f
     const val TAB_INDEX_GRAPH = 0
     const val TAB_INDEX_DETAILS = 1
+    const val DETAILS_OF_NODE = 0
+    const val DETAILS_OF_EDGE = 1
 }
