@@ -8,7 +8,7 @@ object CommonApiRepository {
     fun <T>callApiSynchronous(callDef: () -> Response<T>): T? {
         StrictMode.setThreadPolicy(
             StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
+                // .detectDiskReads()
                 .detectDiskWrites()
                 // .detectNetwork()
                 .penaltyLog()

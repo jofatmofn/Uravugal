@@ -12,6 +12,7 @@ import org.sakuram.relation.apimodel.ProjectVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import org.sakuram.relation.repository.PersonRelationApiRepository
 import org.sakuram.relation.repository.ProjectUserApiRepository
+import org.sakuram.relation.utility.AppValues
 import org.sakuram.relation.utility.Constants
 import org.sakuram.relation.utility.Constants.PERSON_NODE_SCALE_X
 import org.sakuram.relation.utility.Constants.PERSON_NODE_SCALE_Y
@@ -65,7 +66,7 @@ class MainScreenViewModel: ViewModel() {
                     it.copy(attributeValueList = personDetails?.attributeValueVOList?.map { attributeValueVO: AttributeValueVO ->
                         AttributeValue(
                             attributeValueVO.attributeName,
-                            attributeValueVO.attributeValue
+                            getAttributeValue(attributeValueVO),
                         )
                     } ?: emptyList<AttributeValue>())
                 }
@@ -82,7 +83,7 @@ class MainScreenViewModel: ViewModel() {
                     it.copy(attributeValueList = relationDetails?.attributeValueVOList?.map { attributeValueVO: AttributeValueVO ->
                         AttributeValue(
                             attributeValueVO.attributeName,
-                            attributeValueVO.attributeValue
+                            getAttributeValue(attributeValueVO),
                         )
                     } ?: emptyList<AttributeValue>())
                 }
@@ -167,10 +168,27 @@ class MainScreenViewModel: ViewModel() {
         }
     }
 
+    fun retrieveAppStartValues() {
+        val retrieveAppStartValuesResponseVO = PersonRelationApiRepository.retrieveAppStartValues()
+        AppValues.domainValueVOMap = retrieveAppStartValuesResponseVO?.domainValueVOList!!.associateBy({it.id}, {it})
+    }
+
     fun projectSwitched(projectName: String) {
         // This too works, but not recommended: _uiState.value = MainScreenUiState(projectName = projectName)
         _mainScreenUiState.update {
             it.copy(projectName = projectName)
+        }
+    }
+
+    private fun getAttributeValue(attributeValueVO: AttributeValueVO): String {
+        val domainValueVO = AppValues.domainValueVOMap[attributeValueVO.attributeDvId]
+        return if (domainValueVO == null) {
+            ""
+        } else if (domainValueVO.attributeDomain == null || domainValueVO.attributeDomain == "") {
+            attributeValueVO.attributeValue
+        } else {
+            val dVVO = AppValues.domainValueVOMap[attributeValueVO.attributeValue.toLong()]
+            dVVO?.value ?: ""
         }
     }
 }

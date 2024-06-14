@@ -74,8 +74,8 @@ fun DetailsTab(
             // Header
             item {
                 Row(Modifier.background(Color.Gray).width(lazyRowWidthDp)) {
-                    TableCell(text = "Attribute", weight = column1Weight)
-                    TableCell(text = "Value", weight = column2Weight)
+                    TableCell(text = "Value", weight = column1Weight)
+                    TableCell(text = "Attribute", weight = column2Weight)
                 }
             }
 
@@ -83,8 +83,8 @@ fun DetailsTab(
             attributeValueList.map {
                 item {
                     Row(Modifier.width(lazyRowWidthDp)) {
-                        TableCell(text = it.attributeName, weight = column1Weight)
-                        TableCell(text = it.attributeValue, weight = column2Weight)
+                        TableCell(text = it.attributeValue, weight = column1Weight)
+                        TableCell(text = it.attributeName, weight = column2Weight)
                     }
                 }
             }

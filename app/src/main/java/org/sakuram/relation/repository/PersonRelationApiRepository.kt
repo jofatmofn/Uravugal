@@ -6,6 +6,7 @@ import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.sakuram.relation.api.RestAPI
 import org.sakuram.relation.apimodel.GraphVO
+import org.sakuram.relation.apimodel.RetrieveAppStartValuesResponseVO
 import org.sakuram.relation.apimodel.RetrievePersonAttributesResponseVO
 import org.sakuram.relation.apimodel.RetrieveRelationAttributesResponseVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
@@ -52,6 +53,14 @@ object PersonRelationApiRepository {
         }
         return CommonApiRepository.callApiAsynchronous<GraphVO>(CoroutineScope(
             coroutineContext), lambda)
+    }
+
+    fun retrieveAppStartValues(): RetrieveAppStartValuesResponseVO? {
+        return CommonApiRepository.callApiSynchronous<RetrieveAppStartValuesResponseVO> {
+            RestAPI.uravugalPersonRelationApi.retrieveAppStartValues(
+            )
+                .execute()
+        }
     }
 
 }

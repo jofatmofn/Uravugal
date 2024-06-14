@@ -73,6 +73,7 @@ class MainActivity : ComponentActivity() {
                     dialog("searchPerson") { SearchPersonDialog(navController, viewModel) }
                 }
             }
+            viewModel.retrieveAppStartValues()
         }
     }
 }
