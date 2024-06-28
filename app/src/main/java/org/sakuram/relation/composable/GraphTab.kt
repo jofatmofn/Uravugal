@@ -15,7 +15,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import org.sakuram.relation.utility.Constants
 import org.sakuram.relation.viewmodel.Edge
 import org.sakuram.relation.viewmodel.MainScreenViewModel
@@ -48,6 +51,7 @@ fun GraphTab
     var selectedPersonMS by rememberSaveable { mutableStateOf<Map.Entry<Long, Node>?>(null) }
     var selectedRelationMS by rememberSaveable { mutableStateOf<Map.Entry<Long, Edge>?>(null) }
     val graphTabUiState by mainScreenViewModel.graphTabUiState.collectAsState()
+    var graphClick:Int by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -59,8 +63,15 @@ fun GraphTab
                 .width(2500.dp)
                 .height(1000.dp)
                 .pointerInput(Unit) {
+                    graphClick = 0
                     detectTapGestures(
+                        onDoubleTap = {selectedPosition ->
+                            graphClick = 2
+                            selectedPersonMS = graphTabUiState.nodesMap?.entries?.find { it.value.xStart < selectedPosition.x && selectedPosition.x < it.value.xEnd  &&
+                                    it.value.yStart < selectedPosition.y && selectedPosition.y < it.value.yEnd }
+                        },
                         onTap = {selectedPosition ->
+                            graphClick = 1
                             selectedPersonMS = graphTabUiState.nodesMap?.entries?.find { it.value.xStart < selectedPosition.x && selectedPosition.x < it.value.xEnd  &&
                                     it.value.yStart < selectedPosition.y && selectedPosition.y < it.value.yEnd }
                             selectedRelationMS = graphTabUiState.edgesMap?.entries?.find { compareWithEpsilon(distance(it.value.xStart, it.value.yStart, selectedPosition.x, selectedPosition.y) + distance(selectedPosition.x, selectedPosition.y, it.value.xEnd, it.value.yEnd),
@@ -100,24 +111,37 @@ fun GraphTab
             }
         }
 
-        if(selectedPersonMS != null) {
-            try {
-                mainScreenViewModel.switchTab(Constants.TAB_INDEX_DETAILS)
-                mainScreenViewModel.setNodeDetails(selectedPersonMS!!.value.label)
-                mainScreenViewModel.retrievePersonAttributes(selectedPersonMS!!.key)
-            } catch(e: NumberFormatException) {
-                println("Invalid Person Id")
+        if(graphClick == 1) {
+            if (selectedPersonMS != null) {
+                try {
+                    mainScreenViewModel.switchTab(Constants.TAB_INDEX_DETAILS)
+                    mainScreenViewModel.setNodeDetails(selectedPersonMS!!.value.label)
+                    mainScreenViewModel.retrievePersonAttributes(selectedPersonMS!!.key)
+                } catch (e: NumberFormatException) {
+                    println("Invalid Person Id")
+                }
+            } else if (selectedRelationMS != null) {
+                try {
+                    mainScreenViewModel.switchTab(Constants.TAB_INDEX_DETAILS)
+                    mainScreenViewModel.setEdgeDetails(
+                        selectedRelationMS!!.value.label,
+                        graphTabUiState.nodesMap?.get(selectedRelationMS!!.value.source)?.label
+                            ?: "",
+                        graphTabUiState.nodesMap?.get(selectedRelationMS!!.value.target)?.label
+                            ?: ""
+                    )
+                    mainScreenViewModel.retrieveRelationAttributes(selectedRelationMS!!.key)
+                } catch (e: NumberFormatException) {
+                    println("Invalid Relation Id")
+                }
             }
-        } else if(selectedRelationMS != null) {
-            try {
-                mainScreenViewModel.switchTab(Constants.TAB_INDEX_DETAILS)
-                mainScreenViewModel.setEdgeDetails(selectedRelationMS!!.value.label,
-                    graphTabUiState.nodesMap?.get(selectedRelationMS!!.value.source)?.label ?: "",
-                    graphTabUiState.nodesMap?.get(selectedRelationMS!!.value.target)?.label ?: ""
-                )
-                mainScreenViewModel.retrieveRelationAttributes(selectedRelationMS!!.key)
-            } catch(e: NumberFormatException) {
-                println("Invalid Relation Id")
+        } else if(graphClick == 2) {
+            if (selectedPersonMS != null) {
+                try {
+                    mainScreenViewModel.retrieveRelations(RetrieveRelationsRequestVO(selectedPersonMS!!.key))
+                } catch (e: NumberFormatException) {
+                    println("Invalid Person Id")
+                }
             }
         }
 
