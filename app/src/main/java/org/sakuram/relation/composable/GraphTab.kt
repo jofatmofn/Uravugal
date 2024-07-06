@@ -101,7 +101,6 @@ fun GraphTab
                 )
             }
             graphTabUiState.edgesMap?.map { edgeEntry ->
-                println("${edgeEntry.value.xStart}, ${edgeEntry.value.xEnd} to ${edgeEntry.value.yStart}, ${edgeEntry.value.yEnd}")
                 drawLine(
                     color = Color.Magenta,
                     strokeWidth = 5f,

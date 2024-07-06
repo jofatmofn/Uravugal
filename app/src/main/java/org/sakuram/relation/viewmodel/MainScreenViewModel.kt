@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.sakuram.relation.apimodel.AttributeValueVO
+import org.sakuram.relation.apimodel.DomainValueVO
 import org.sakuram.relation.apimodel.ProjectVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
 import org.sakuram.relation.repository.PersonRelationApiRepository
@@ -120,12 +121,10 @@ class MainScreenViewModel: ViewModel() {
                         {relationVO ->
                             val sourceNode: Node? = _graphTabUiState.value.nodesMap?.get(relationVO.source.toLong())
                             val targetNode: Node? = _graphTabUiState.value.nodesMap?.get(relationVO.target.toLong())
-                            println("${relationVO.label}: ${sourceNode?.xStart}, ${sourceNode?.yStart}, ${sourceNode?.xEnd}, ${sourceNode?.yEnd}")
-                            println("${relationVO.label}: ${targetNode?.xStart}, ${targetNode?.yStart}, ${targetNode?.xEnd}, ${targetNode?.yEnd}")
-                            var xStart: Float = 0.0f
-                            var xEnd: Float = 0.0f
-                            var yStart: Float = 0.0f
-                            var yEnd: Float = 0.0f
+                            var xStart = 0.0f
+                            var xEnd = 0.0f
+                            var yStart = 0.0f
+                            var yEnd = 0.0f
                             if (sourceNode != null && targetNode != null) {
                                 if (sourceNode.yStart < targetNode.yStart) {
                                     yStart = sourceNode.yEnd
@@ -171,6 +170,12 @@ class MainScreenViewModel: ViewModel() {
     fun retrieveAppStartValues() {
         val retrieveAppStartValuesResponseVO = PersonRelationApiRepository.retrieveAppStartValues()
         AppValues.domainValueVOMap = retrieveAppStartValuesResponseVO?.domainValueVOList!!.associateBy({it.id}, {it})
+        retrieveAppStartValuesResponseVO.domainValueVOList.map {
+            if (!AppValues.categorywiseDomainValueVOListMap.containsKey(it.category)) {
+                AppValues.categorywiseDomainValueVOListMap[it.category] = arrayListOf<DomainValueVO>()
+            }
+            AppValues.categorywiseDomainValueVOListMap[it.category]?.add(it)
+        }
     }
 
     fun projectSwitched(projectName: String) {

@@ -5,6 +5,7 @@ import org.sakuram.relation.apimodel.GraphVO
 import org.sakuram.relation.apimodel.RetrieveAppStartValuesResponseVO
 import org.sakuram.relation.apimodel.RetrievePersonAttributesResponseVO
 import org.sakuram.relation.apimodel.RetrieveRelationAttributesResponseVO
+import org.sakuram.relation.apimodel.SearchResultsVO
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -19,6 +20,9 @@ interface UravugalPersonRelationApi {
 
     @POST("/relation/basic/retrieveRelations")
     suspend fun retrieveRelations(@Body requestBody: RequestBody): Response<GraphVO>
+
+    @POST("/relation/basic/searchPerson")
+    suspend fun searchPerson(@Body requestBody: RequestBody): Response<SearchResultsVO>
 
     @POST("/relation/basic/retrieveAppStartValues")
     fun retrieveAppStartValues(): Call<RetrieveAppStartValuesResponseVO>

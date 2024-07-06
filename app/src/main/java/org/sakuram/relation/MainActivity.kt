@@ -48,6 +48,7 @@ import org.sakuram.relation.ui.theme.UravugalTheme
 import org.sakuram.relation.utility.Constants
 import org.sakuram.relation.utility.UravugalPreferences
 import org.sakuram.relation.viewmodel.MainScreenViewModel
+import org.sakuram.relation.viewmodel.SearchPersonDialogViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -59,18 +60,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             UravugalTheme {
                 val navController = rememberNavController()
-                // Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    UravugalScreen(
-                        modifier = Modifier, // .padding(innerPadding),
-                        navController, viewModel
-                    )
-                // }
+				UravugalScreen(
+					modifier = Modifier, // .padding(innerPadding),
+					navController, viewModel
+				)
                 // TODO https://developer.android.com/guide/navigation/design
                 // instead of passing the NavController to your composables, expose an event to the NavHost
                 NavHost(navController, startDestination = "home") {
                     composable("home") { UravugalTopBar(navController, viewModel) }
                     dialog("switchProject") { SwitchProjectDialog(navController, viewModel) }
-                    dialog("searchPerson") { SearchPersonDialog(navController, viewModel) }
+                    dialog("searchPerson") { SearchPersonDialog(navController, SearchPersonDialogViewModel()) }
                 }
             }
             viewModel.retrieveAppStartValues()
@@ -190,7 +189,6 @@ fun UravugalTopBar(
                 onClick = {
                     showMenu = false
                     navController.navigate("switchProject")
-                    println("Returned from Switch Project Dialog")
                           },
                 leadingIcon = {
                     Icon(

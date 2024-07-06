@@ -6,10 +6,12 @@ import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.sakuram.relation.api.RestAPI
 import org.sakuram.relation.apimodel.GraphVO
+import org.sakuram.relation.apimodel.PersonSearchCriteriaVO
 import org.sakuram.relation.apimodel.RetrieveAppStartValuesResponseVO
 import org.sakuram.relation.apimodel.RetrievePersonAttributesResponseVO
 import org.sakuram.relation.apimodel.RetrieveRelationAttributesResponseVO
 import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
+import org.sakuram.relation.apimodel.SearchResultsVO
 import retrofit2.Response
 import kotlin.coroutines.coroutineContext
 
@@ -19,7 +21,6 @@ object PersonRelationApiRepository {
             RestAPI.uravugalPersonRelationApi.retrievePersonAttributes(
                 RequestBody.create(
                     MediaType.parse("application/json; charset=utf-8"),
-                    // JSONObject(mapOf("entityId" to entityId)).toString()
                     entityId.toString()
                 )
             )
@@ -52,6 +53,19 @@ object PersonRelationApiRepository {
             )
         }
         return CommonApiRepository.callApiAsynchronous<GraphVO>(CoroutineScope(
+            coroutineContext), lambda)
+    }
+
+    suspend fun searchPerson(personSearchCriteriaVO: PersonSearchCriteriaVO): SearchResultsVO? {
+        val lambda : suspend CoroutineScope.() -> Response<SearchResultsVO> = {
+            RestAPI.uravugalPersonRelationApi.searchPerson(
+                RequestBody.create(
+                    MediaType.parse("application/json; charset=utf-8"),
+                    RestAPI.moshi.adapter(PersonSearchCriteriaVO::class.java).toJson(personSearchCriteriaVO).toString()
+                )
+            )
+        }
+        return CommonApiRepository.callApiAsynchronous<SearchResultsVO>(CoroutineScope(
             coroutineContext), lambda)
     }
 

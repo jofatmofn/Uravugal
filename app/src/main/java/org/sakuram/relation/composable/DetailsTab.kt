@@ -60,12 +60,9 @@ fun DetailsTab(
 
         val scrollState = rememberScrollState()
 
-        // The LazyColumn will be our table. Notice the use of the weights below
         LazyColumn(
             Modifier
-                /* .fillMaxSize() */
                 .padding(16.dp)
-                // .fillMaxWidth ()
                 .width(500.dp)
                 .height(500.dp)
                 .horizontalScroll(scrollState),

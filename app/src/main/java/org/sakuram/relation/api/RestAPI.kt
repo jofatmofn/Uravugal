@@ -101,9 +101,7 @@ class JsonDateAdapter : JsonAdapter<Date>() {
 
     @ToJson
     override fun toJson(writer: JsonWriter, value: Date?) {
-        if (value != null) {
-            writer.value(value.toString())
-        }
+        writer.value(value?.toString())
     }
 }
 
@@ -124,8 +122,6 @@ class JsonByteArrayAdapter : JsonAdapter<ByteArray>() {
 
     @ToJson
     override fun toJson(writer: JsonWriter, value: ByteArray?) {
-        if (value != null) {
-            writer.value(value.toString())
-        }
+        writer.value(value?.toString())
     }
 }

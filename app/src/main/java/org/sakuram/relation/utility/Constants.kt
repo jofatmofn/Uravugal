@@ -13,4 +13,10 @@ object Constants {
     const val TAB_INDEX_DETAILS = 1
     const val DETAILS_OF_NODE = 0
     const val DETAILS_OF_EDGE = 1
+    const val CATEGORY_PERSON_ATTRIBUTE = "PersAttribute"
+    const val COLOR_ROSY_BROWN = 0xFFBC8F8F
+    const val COLOR_SANDY_BROWN = 0xFFF4A460
+    const val COLOR_SADDLE_BROWN = 0xFF8B4513
+    const val COLOR_BEIGE = 0xFFF5F5DC
+    const val COLOR_GOLD = 0xFFFFD700
 }

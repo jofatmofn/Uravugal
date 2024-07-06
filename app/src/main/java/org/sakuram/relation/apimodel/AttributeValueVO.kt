@@ -17,4 +17,6 @@ class AttributeValueVO(
     val isPrivate: Boolean?,
     val maybeNotRegistered: Boolean,
     val avValue: String?,
-)
+) {
+    constructor(attributeDvId: Long, attributeValue: String, maybeNotRegistered: Boolean): this( null, attributeDvId, "", attributeValue, null, null, false, null, null, null, maybeNotRegistered, null)
+}

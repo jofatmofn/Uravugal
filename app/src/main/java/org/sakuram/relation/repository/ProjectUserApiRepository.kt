@@ -10,7 +10,6 @@ object ProjectUserApiRepository {
             RestAPI.uravugalProjectUserApi.switchProject(
                 RequestBody.create(
                     okhttp3.MediaType.parse("text/plain; charset=utf-8"),
-                    // JSONObject(mapOf("entityId" to entityId)).toString()
                     projectId
                 )
             )
