@@ -19,4 +19,7 @@ object Constants {
     const val COLOR_SADDLE_BROWN = 0xFF8B4513
     const val COLOR_BEIGE = 0xFFF5F5DC
     const val COLOR_GOLD = 0xFFFFD700
+    const val COLOR_CUSTOM_WHITE = 0xFFfefefe
+    const val COLOR_FLORAL_WHITE = 0xFFFFFAF0
+    const val COLOR_GHOST_WHITE = 0xFFF8F8FF
 }

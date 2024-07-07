@@ -75,6 +75,7 @@ fun SearchPersonDialog(
             VerticalDivider(modifier = Modifier.width(10.dp))
 
             Button(onClick = {
+                // TODO Validate inputs
                 searchPersonDialogViewModel.searchPerson(
                     PersonSearchCriteriaVO(
                         searchPersonDialogUiState.isLenient,
@@ -83,6 +84,7 @@ fun SearchPersonDialog(
                         }
                     )
                 )
+                navController.navigate("searchResults")
             }) {
                 Text("Search")
             }

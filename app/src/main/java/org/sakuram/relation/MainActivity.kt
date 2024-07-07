@@ -43,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import org.sakuram.relation.composable.DetailsTab
 import org.sakuram.relation.composable.GraphTab
 import org.sakuram.relation.composable.SearchPersonDialog
+import org.sakuram.relation.composable.SearchResultsDialog
 import org.sakuram.relation.composable.SwitchProjectDialog
 import org.sakuram.relation.ui.theme.UravugalTheme
 import org.sakuram.relation.utility.Constants
@@ -54,6 +55,7 @@ import org.sakuram.relation.viewmodel.SearchPersonDialogViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: MainScreenViewModel by viewModels()
+        val searchPersonDialogViewModel = SearchPersonDialogViewModel()
         super.onCreate(savedInstanceState)
         UravugalPreferences.setup(applicationContext)
         enableEdgeToEdge()
@@ -69,7 +71,8 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController, startDestination = "home") {
                     composable("home") { UravugalTopBar(navController, viewModel) }
                     dialog("switchProject") { SwitchProjectDialog(navController, viewModel) }
-                    dialog("searchPerson") { SearchPersonDialog(navController, SearchPersonDialogViewModel()) }
+                    dialog("searchPerson") { SearchPersonDialog(navController, searchPersonDialogViewModel) }
+                    dialog("searchResults") { SearchResultsDialog(navController, searchPersonDialogViewModel) }
                 }
             }
             viewModel.retrieveAppStartValues()

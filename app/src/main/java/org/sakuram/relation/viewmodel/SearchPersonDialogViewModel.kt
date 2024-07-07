@@ -17,7 +17,7 @@ class SearchPersonDialogViewModel: ViewModel() {
     private val _searchPersonDialogUiState = MutableStateFlow(SearchPersonDialogUiState(searchCriteria, false))
     val searchPersonDialogUiState = _searchPersonDialogUiState.asStateFlow()
     private val _searchResultsDialogUiState = MutableStateFlow(SearchResultsDialogUiState(emptyList(), -1))
-    // val searchResultsDialogUiState = _searchResultsDialogUiState.asStateFlow()
+    val searchResultsDialogUiState = _searchResultsDialogUiState.asStateFlow()
 
     fun uiToStateIsLenient(isLenient: Boolean) {
         _searchPersonDialogUiState.update {
