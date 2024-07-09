@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     composable("home") { UravugalTopBar(navController, viewModel) }
                     dialog("switchProject") { SwitchProjectDialog(navController, viewModel) }
                     dialog("searchPerson") { SearchPersonDialog(navController, searchPersonDialogViewModel) }
-                    dialog("searchResults") { SearchResultsDialog(navController, searchPersonDialogViewModel) }
+                    dialog("searchResults") { SearchResultsDialog(navController, viewModel, searchPersonDialogViewModel) }
                 }
             }
             viewModel.retrieveAppStartValues()

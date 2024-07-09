@@ -60,6 +60,14 @@ class SearchPersonDialogViewModel: ViewModel() {
         _searchCriteria -= _searchCriteria[searchCriterionindex]
     }
 
+    fun uiToStateSelectedRowIndex(selectedRowIndex: Int) {
+        _searchResultsDialogUiState.update {
+            it.copy(
+                selectedRowIndex = selectedRowIndex
+            )
+        }
+    }
+
     fun searchPerson(personSearchCriteriaVO: PersonSearchCriteriaVO) {
         /* job?.cancel()
         job = */ viewModelScope.launch {
@@ -68,7 +76,7 @@ class SearchPersonDialogViewModel: ViewModel() {
                 _searchResultsDialogUiState.update {
                     it.copy(
                         tableContent = searchResultsVO?.resultsList ?: emptyList(),
-                        selectedRow = -1
+                        selectedRowIndex = -1
                     )
                 }
             }

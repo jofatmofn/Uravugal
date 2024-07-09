@@ -2,5 +2,5 @@ package org.sakuram.relation.viewmodel
 
 data class SearchResultsDialogUiState (
     val tableContent: List<List<String>>?,
-    val selectedRow: Int
+    val selectedRowIndex: Int   // tableContent includes header also, but this index excludes that
 )
