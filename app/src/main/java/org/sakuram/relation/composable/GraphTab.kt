@@ -49,7 +49,7 @@ fun GraphTab
 ) {
     val textMeasurer = rememberTextMeasurer()
     var selectedPersonMS by rememberSaveable { mutableStateOf<Map.Entry<Long, Node>?>(null) }
-    var selectedRelationMS by rememberSaveable { mutableStateOf<Map.Entry<Long, Edge>?>(null) }
+    var selectedRelationMS by rememberSaveable { mutableStateOf<Map.Entry<String, Edge>?>(null) }
     val graphTabUiState by mainScreenViewModel.graphTabUiState.collectAsState()
     var graphClick:Int by remember { mutableIntStateOf(0) }
 
@@ -119,7 +119,7 @@ fun GraphTab
                 } catch (e: NumberFormatException) {
                     println("Invalid Person Id")
                 }
-            } else if (selectedRelationMS != null) {
+            } else if (selectedRelationMS != null && selectedRelationMS!!.key[0] != 'S') {
                 try {
                     mainScreenViewModel.switchTab(Constants.TAB_INDEX_DETAILS)
                     mainScreenViewModel.setEdgeDetails(
@@ -129,7 +129,7 @@ fun GraphTab
                         graphTabUiState.nodesMap?.get(selectedRelationMS!!.value.target)?.label
                             ?: ""
                     )
-                    mainScreenViewModel.retrieveRelationAttributes(selectedRelationMS!!.key)
+                    mainScreenViewModel.retrieveRelationAttributes(selectedRelationMS!!.key.toLong())
                 } catch (e: NumberFormatException) {
                     println("Invalid Relation Id")
                 }

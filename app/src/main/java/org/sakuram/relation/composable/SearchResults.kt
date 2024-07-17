@@ -23,7 +23,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import org.sakuram.relation.apimodel.RetrieveRelationsRequestVO
+import org.sakuram.relation.apimodel.PersonVO
 import org.sakuram.relation.utility.Constants
 import org.sakuram.relation.viewmodel.MainScreenViewModel
 import org.sakuram.relation.viewmodel.SearchPersonDialogViewModel
@@ -69,9 +68,22 @@ fun SearchResultsDialog(
         Row {
             Button(onClick = {
                 if (searchResultsDialogUiState.selectedRowIndex > -1) {
-                    mainScreenViewModel.retrieveRelations(
-                        RetrieveRelationsRequestVO(
-                            searchResultsDialogUiState.tableContent!![searchResultsDialogUiState.selectedRowIndex + 1][0].toLong()
+                    val headerRow = searchResultsDialogUiState.tableContent!![0]
+                    val selectedRow = searchResultsDialogUiState.tableContent!![searchResultsDialogUiState.selectedRowIndex + 1]
+                    mainScreenViewModel.addNodeToGraph(
+                        PersonVO(
+                            id = selectedRow[0],
+                            label = "("
+                                    + selectedRow[headerRow.indexOf(Constants.SEARCH_RESULT_HEADER_ID)]
+                                    + "/"
+                                    + selectedRow[headerRow.indexOf(Constants.SEARCH_RESULT_HEADER_GENDER)][0]
+                                    + ")"
+                                    + selectedRow[headerRow.indexOf(Constants.SEARCH_RESULT_HEADER_FIRST_NAME)]
+                                    + if (headerRow.indexOf(Constants.SEARCH_RESULT_HEADER_LABEL) == -1 || selectedRow[headerRow.indexOf(Constants.SEARCH_RESULT_HEADER_LABEL)] == "") "" else "/" + (selectedRow[headerRow.indexOf(Constants.SEARCH_RESULT_HEADER_LABEL)]),
+                            size = Constants.DEFAULT_NODE_SIZE,
+                            color = null,
+                            x = (10..50).random().toDouble(),
+                            y = (10..50).random().toDouble()
                         )
                     )
                     navController.clearBackStack("home")
@@ -155,7 +167,6 @@ fun SearchResultsDialog(
                                             searchPersonDialogViewModel.uiToStateSelectedRowIndex(
                                                 rowIndex
                                             )
-                                            println("Selected Person: ${searchResultsDialogUiState.selectedRowIndex}")
                                         }
                                     )
                                 }

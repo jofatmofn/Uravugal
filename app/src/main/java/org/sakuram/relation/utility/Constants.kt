@@ -9,6 +9,7 @@ object Constants {
     const val PERSON_NODE_SCALE_Y = 10
     const val PERSON_NODE_SIZE_X = 500f
     const val PERSON_NODE_SIZE_Y = 100f
+    const val DEFAULT_NODE_SIZE = 5.0
     const val TAB_INDEX_GRAPH = 0
     const val TAB_INDEX_DETAILS = 1
     const val DETAILS_OF_NODE = 0
@@ -22,4 +23,8 @@ object Constants {
     const val COLOR_CUSTOM_WHITE = 0xFFfefefe
     const val COLOR_FLORAL_WHITE = 0xFFFFFAF0
     const val COLOR_GHOST_WHITE = 0xFFF8F8FF
+    const val SEARCH_RESULT_HEADER_ID = "Person Id"
+    const val SEARCH_RESULT_HEADER_GENDER = "gender"
+    const val SEARCH_RESULT_HEADER_FIRST_NAME = "firstName"
+    const val SEARCH_RESULT_HEADER_LABEL = "label"
 }

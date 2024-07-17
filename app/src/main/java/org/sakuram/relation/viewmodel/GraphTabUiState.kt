@@ -2,7 +2,7 @@ package org.sakuram.relation.viewmodel
 
 data class GraphTabUiState (
     val nodesMap: Map<Long, Node>?,
-    val edgesMap: Map<Long, Edge>?,
+    val edgesMap: Map<String, Edge>?,
 )
 
 data class Node (

@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import org.sakuram.relation.composable.AscertainRelationDialog
 import org.sakuram.relation.composable.DetailsTab
 import org.sakuram.relation.composable.GraphTab
 import org.sakuram.relation.composable.SearchPersonDialog
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
                     dialog("switchProject") { SwitchProjectDialog(navController, viewModel) }
                     dialog("searchPerson") { SearchPersonDialog(navController, searchPersonDialogViewModel) }
                     dialog("searchResults") { SearchResultsDialog(navController, viewModel, searchPersonDialogViewModel) }
+                    dialog("ascertainRelation") { AscertainRelationDialog(navController, viewModel) }
                 }
             }
             viewModel.retrieveAppStartValues()
@@ -171,7 +173,10 @@ fun UravugalTopBar(
                 })
             DropdownMenuItem(
                 text = { Text(text = stringResource(R.string.menu_2)) },
-                onClick = { showMenu = false },
+                onClick = {
+                    showMenu = false
+                    navController.navigate("ascertainRelation")
+                          },
                 leadingIcon = {
                     Icon(
                         ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),

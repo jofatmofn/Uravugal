@@ -64,12 +64,10 @@ fun SwitchProjectDialog(navController: NavController, mainScreenViewModel: MainS
                     if (projectDetails == null) {
                         println("No project set")
                     } else {
-                        println("Project set as ${projectDetails.projectName}")
                         mainScreenViewModel.projectSwitched(projectName = projectDetails.projectName)
                     }
                 }
                 // TODO On Error, don't popBackStack
-                println("About to popBackStack")
                 navController.popBackStack()
             }) {
                 Text("Switch")

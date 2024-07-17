@@ -22,6 +22,7 @@ object RestAPI {
 
     val uravugalProjectUserApi: UravugalProjectUserApi
     val uravugalPersonRelationApi: UravugalPersonRelationApi
+    val uravugalAlgoApi: UravugalAlgoApi
     val moshi: Moshi
 
     init {
@@ -45,6 +46,8 @@ object RestAPI {
             .create(UravugalProjectUserApi::class.java)
         uravugalPersonRelationApi = retrofit
             .create(UravugalPersonRelationApi::class.java)
+        uravugalAlgoApi = retrofit
+            .create(UravugalAlgoApi::class.java)
     }
 
 }
